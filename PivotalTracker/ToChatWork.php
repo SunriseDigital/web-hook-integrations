@@ -11,8 +11,8 @@ function main(){
   $json = json_decode($raw);
   
   // 投稿対象の部屋のIDを取得
-  if (!isset($_GET['room_id'])){
-    new Exception("呼び出し時に room_id が指定されていない");
+  if (!array_key_exists('room_id', $_GET)){
+    throw new Exception("呼び出し時に room_id が指定されていない");
   }
   $room_id = $_GET['room_id'];
 
@@ -39,7 +39,7 @@ function main(){
   $stories = array();
   foreach ($json->primary_resources as $rsc) {
     if ($rsc->kind != "story") {
-      new Exception("primary_resources の kind が story じゃなくて " . $rsc->kind);
+      throw new Exception("primary_resources の kind が story じゃなくて " . $rsc->kind);
     }
     $stories[] = sprintf("[info]%s\n%s\n[/info]", $rsc->name, $rsc->url);
   }
