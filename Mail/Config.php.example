@@ -1,0 +1,10 @@
+<?php
+define('ZEND_PATH', "/path/to/zend/lib");
+define('CHATWORK_API_TOKEN', "your-api-token-here");
+function getPOP3Account() {
+  return array(
+    'host'     => 'your.mail.server.com',
+    'user'     => 'your-account-name',
+    'password' => 'hackme',
+  );
+}

@@ -1,2 +1,5 @@
 PivotalTracker/Config.php
 PivotalTracker/log/*
+Mail/Config.php
+Mail/log/*
+
