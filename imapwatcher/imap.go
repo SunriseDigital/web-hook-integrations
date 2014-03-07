@@ -77,41 +77,48 @@ func (imp *imapWatcher) process(mail chan<- []byte) error {
 
 		undeleted := searchUndeleted.Data[0].SearchResults()
 		if len(undeleted) == 0 {
-			if _, err = c.Idle(); err != nil {
-				return fmt.Errorf("Could not start idle: %v", err)
-			}
 			for {
-				if err = c.Recv(-1); err != nil {
+				if _, err = c.Idle(); err != nil {
+					return fmt.Errorf("Could not start idle: %v", err)
+				}
+				for {
+					if err = c.Recv(2 * time.Minute); err != nil {
+						if err == imap.ErrTimeout {
+							break
+						}
+						return err
+					}
+					if c.Data[len(c.Data)-1].Label == "EXISTS" {
+						break
+					}
+				}
+
+				if _, err = c.IdleTerm(); err != nil {
 					if err == io.EOF {
 						return nil
 					}
-					return err
+					return fmt.Errorf("Could not end idle: %v", err)
 				}
-				if c.Data[len(c.Data)-1].Label == "EXISTS" {
+
+				if _, err = c.Select(imp.mailbox, false); err != nil {
+					return fmt.Errorf("Could not select %s: %v", imp.mailbox, err)
+				}
+
+				searchUndeleted, err = imap.Wait(c.Search("UNDELETED"))
+				if err != nil {
+					return fmt.Errorf("Could not search UNDELETED: %v", err)
+				}
+				if len(searchUndeleted.Data) != 1 {
+					return fmt.Errorf("Invalid search result: %v", searchUndeleted.Data)
+				}
+
+				undeleted = searchUndeleted.Data[0].SearchResults()
+				if len(undeleted) == 0 {
+					continue
+				} else {
 					break
 				}
 			}
-
-			if _, err = c.IdleTerm(); err != nil {
-				if err == io.EOF {
-					return nil
-				}
-				return fmt.Errorf("Could not end idle: %v", err)
-			}
-
-			if _, err = c.Select(imp.mailbox, false); err != nil {
-				return fmt.Errorf("Could not select %s: %v", imp.mailbox, err)
-			}
-
-			searchUndeleted, err = imap.Wait(c.Search("UNDELETED"))
-			if err != nil {
-				return fmt.Errorf("Could not search UNDELETED: %v", err)
-			}
-			if len(searchUndeleted.Data) != 1 {
-				return fmt.Errorf("Invalid search result: %v", searchUndeleted.Data)
-			}
-
-			undeleted = searchUndeleted.Data[0].SearchResults()
 		}
 
 		set, _ := imap.NewSeqSet("")
