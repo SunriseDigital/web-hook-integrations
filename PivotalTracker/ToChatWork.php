@@ -80,11 +80,12 @@ function log_error($num, $str, $file, $line, $context = null) {
 
 function log_exception(Exception $e) {
   $message = sprintf(
-    "Type: %s\nMessage: %s\nFile: %s\nLine: %s\n",
+    "Type: %s\nMessage: %s\nFile: %s\nLine: %s\nDate: %s\n",
     get_class($e),
     $e->getMessage(),
     $e->getFile(),
-    $e->getLine()
+    $e->getLine(),
+    date("Y-m-d H:i:s")
   );
   file_put_contents("log/pivotal_tracker_hook_exceptions.log", $message, FILE_APPEND);
   exit();

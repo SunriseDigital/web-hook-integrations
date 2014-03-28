@@ -1,3 +1,6 @@
 <?php
 define('CHATWORK_API_TOKEN', "your-api-token-here");
 
+// ToChatWorkOnReleased.php を使用する場合は
+// Pivotal Tracker 側の API トークンも必要
+define('PIVOTALTRACKER_API_TOKEN', "your-api-token-here");
