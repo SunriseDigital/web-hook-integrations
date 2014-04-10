@@ -117,8 +117,13 @@ function main(){
         $story_json->url
       );
   
-      addTaskChatWork(CHATWORK_API_TOKEN, $room_id, $task_user_ids, $body);
-      //file_put_contents("log/on_release_ret.log", date("Y-m-d H:i:s - ") . var_export($room_id, true) . var_export($task_user_ids, true) . var_export($body, true), FILE_APPEND);
+      // まだロックファイルが存在せず、作成に成功した場合だけ投稿する
+      $fp = @fopen(sprintf("/tmp/PT_ToChatworkOnReleased_%d", $id), "x");
+      if ($fp) {
+        addTaskChatWork(CHATWORK_API_TOKEN, $room_id, $task_user_ids, $body);
+        //file_put_contents("log/on_release_ret.log", date("Y-m-d H:i:s - ") . var_export($room_id, true) . var_export($task_user_ids, true) . var_export($body, true), FILE_APPEND);
+        fclose($fp);
+      }
     } catch (Exception $e) {
       $message = "完了されたストーリーの処理中にエラーが発生しました。\n";
       $message .= "以下のストーリーに関する完了レポートを手動で行う必要があります。\n";
