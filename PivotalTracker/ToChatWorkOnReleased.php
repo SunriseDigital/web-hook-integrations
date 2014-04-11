@@ -118,7 +118,7 @@ function main(){
       );
   
       // まだロックファイルが存在せず、作成に成功した場合だけ投稿する
-      $fp = @fopen(sprintf("/tmp/PT_ToChatworkOnReleased_%d", $id), "x");
+      $fp = @fopen(sprintf("/tmp/PT_ToChatworkOnReleased_%d_%d", $room_id, $id), "x");
       if ($fp) {
         addTaskChatWork(CHATWORK_API_TOKEN, $room_id, $task_user_ids, $body);
         //file_put_contents("log/on_release_ret.log", date("Y-m-d H:i:s - ") . var_export($room_id, true) . var_export($task_user_ids, true) . var_export($body, true), FILE_APPEND);
